@@ -1,0 +1,19 @@
+#!/bin/bash
+#------------------------------------------------------------------------------
+# sample config file
+#------------------------------------------------------------------------------
+## REMOTE
+# ssh user
+RUSER="johndoe"
+# ssh server
+RSERVER="ssh.example.com"
+# path to luks file
+RPATH="/home/johndoe/luks"
+# luks container file
+LUKS_CONTAINER="johndoe-luks.img"
+
+## LOCAL
+# ssh mountpoint
+LPATH="/home/johndoe/luks"
+# local : opened container mountpoint
+LUKS_MOUNTPOINT="/home/johndoe/luks-open"
