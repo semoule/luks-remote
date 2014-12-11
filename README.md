@@ -16,50 +16,34 @@ Manual :
 1. install :
 ----------
 	clone repository
-	```
 	git clone https://github.com/semoule/luks-remote.git
-	```
 
 	Install dependancies
-	```
 	apt-get install cryptsetup rsync fuse sshfs
-	```
 
 2. configure :
 ----------
 	Create config file to avoid use arguments
-	```
 	cp luks-remote.conf.sample luks-remote.conf
-	```
 
 	Edit and fill the file
-	```
 	vi luks-remote.conf
-	```
 
 3. Create the container
 ----------
-	```
 	./luks-remote.sh create 100
-	```
 
 4. mount the container
 ----------
-	```
 	./luks-remote.sh mount
-	```
 
 5. rsync to the container
 ----------
-	```
 	./luks-remote.sh rsync
-	```
 
 6. umount the container
 ----------
-	```
 	./luks-remote.sh umount
-	```
 
 7. troubleshooting
 ----------
@@ -70,20 +54,13 @@ Manual :
 	case 1 : network is recovered
 
 	check status
-	```
 	./luks-remote.sh status
-	```
 
 	try umount
-	```
 	./luks-remote.sh umount
-	```
 
 	check file system consistency
-	```
 	./luks-remote.sh fsck
-	```
-
 
 
 	case 2 : network is unrecoverable for now, I want to force close
