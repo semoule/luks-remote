@@ -17,3 +17,22 @@ LUKS_CONTAINER="johndoe-luks.img"
 LPATH="/home/johndoe/luks"
 # local : opened container mountpoint
 LUKS_MOUNTPOINT="/home/johndoe/luks-open"
+
+## RSYNC
+# rsync binary path
+RSYNC_BIN="/usr/bin/rsync"
+# rsync options
+# you need to remove -n (dry run) to enable real synchronization
+RSYNC_ARGS="-n --delete -avh --progress --bwlimit=128k"
+
+# rsync source
+# directories to backup : full path and trailing slash needed!
+RSYNC_SOURCE[0]="$HOME/Documents/"
+RSYNC_SOURCE[1]="$HOME/Music/"
+RSYNC_SOURCE[2]="$HOME/Images/"
+
+# rsync target
+# directories in luks container : relative path, no matter the trailing slash.
+RSYNC_TARGET[0]="Documents/"
+RSYNC_TARGET[3]="Music/"
+RSYNC_TARGET[2]="Images/"

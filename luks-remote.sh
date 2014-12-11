@@ -159,10 +159,36 @@ luks_status()
 
 	return $?
 }
+luks_rsync()
+{
+	local function_status=0
+
+	if [ "$rsync_list" = "all" ]; then
+		for (( i=0; i<${#RSYNC_SOURCE[@]}; i++ ));
+		do
+			echo
+			echo "${RSYNC_BIN} ${RSYNC_ARGS} ${RSYNC_SOURCE[$i]} ${luks_mountpoint}/${RSYNC_TARGET[$i]}"
+			      ${RSYNC_BIN} ${RSYNC_ARGS} ${RSYNC_SOURCE[$i]} ${luks_mountpoint}/${RSYNC_TARGET[$i]}
+			let function_status=$function_status+$?
+		done
+	else
+		if [ $rsync_list -ge ${#RSYNC_SOURCE[@]} ]; then
+			echo
+			echo "warning : rsync slot empty. exiting!"
+			function_status=1
+		else
+			echo
+			echo "${RSYNC_BIN} ${RSYNC_ARGS} ${RSYNC_SOURCE[$rsync_list]} ${luks_mountpoint}/${RSYNC_TARGET[$rsync_list]}"
+			      ${RSYNC_BIN} ${RSYNC_ARGS} ${RSYNC_SOURCE[$rsync_list]} ${luks_mountpoint}/${RSYNC_TARGET[$rsync_list]}
+			let function_status=$function_status+$?
+		fi
+	fi
+	return $function_status
+}
 usage()
 {
 	echo
-	echo "Usage: $0 mount|umount|status|fsck|resize (MB)|create (MB)"
+	echo "Usage: $0 mount|umount|status|fsck|resize (MB)|create (MB)|rsync"
 	echo
 	echo "-u | --remote-user LOGIN      : use LOGIN to connect to remote ssh server"
 	echo "-s | --remote-server IP       : use IP as remote ssh server"
@@ -171,13 +197,14 @@ usage()
 	echo "-m | --ssh-mountpoint PATH    : use local PATH as mountpoint for ssh server"
 	echo "-l | --luks-mountpoint PATH   : use local PATH as mountpoint for luks opened container"
 	echo "-f | --force                  : force fsck"
+	echo "-r | --rsync-slot INDEX       : rsync only the slot specified"
 	echo "-h | --help                   : display this help"
 	echo
 }
 
 ## MAIN
 # parse arguments
-arguments=`getopt -o c:fhl:m:p:s:u: --long container:,force,help,luks-mountpoint:,ssh-mountpoint:,remote-path:,remote-server:,remote-user:, -n "$0" -- "$@"`
+arguments=`getopt -o c:fhl:m:p:r:s:u: --long container:,force,help,luks-mountpoint:,ssh-mountpoint:,remote-path:,remote-server:,remote-user:,rsync-slot:, -n "$0" -- "$@"`
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$arguments"
 while true ; do
@@ -206,6 +233,10 @@ while true ; do
 			custom_remotepath=$2
 			shift 2
 			;;
+		-r|--rsync-slot)
+			custom_rsync=$2
+			shift 2
+			;;
 		-s|--remote-server)
 			custom_remoteserver=$2
 			shift 2
@@ -226,6 +257,7 @@ rpath=${custom_remotepath:-$RPATH}
 lpath=${custom_sshmountpoint:-$LPATH}
 luks_container=${custom_container:-$LUKS_CONTAINER}
 luks_mountpoint=${custom_luksmountpoint:-$LUKS_MOUNTPOINT}
+rsync_list=${custom_rsync:-all}
 
 # show config
 echo "remote luksfile : ssh://$ruser@$rserver:$rpath/$luks_container"
@@ -268,6 +300,9 @@ case $1 in
 		;;
 	status)
 		luks_status
+		;;
+	rsync)
+		luks_rsync
 		;;
 	*)
 		usage
