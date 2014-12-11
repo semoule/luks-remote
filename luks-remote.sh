@@ -19,10 +19,11 @@
 
 # ABSTRACT
 #------------------------------------------------------------------------------
-# v1.0
+# v1.1
 #
 # This humble script should help you to manage remote LUKS container over ssh
 # You can create/extend/mount/umount/fsck remote container
+# You can also rsync to container.
 # The basic idea is to turn untrusted remote servers as private backup devices
 # You can either use a config file or only use arguments
 # Tested on Debian based distro.
