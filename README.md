@@ -14,46 +14,75 @@ Abstract :
 Manual :
 
 1. install :
-	# clone repository
+----------
+	clone repository
+	```
 	git clone https://github.com/semoule/luks-remote.git
+	```
 
-	# install dependancies
+	Install dependancies
+	```
 	apt-get install cryptsetup rsync fuse sshfs
+	```
 
 2. configure :
-	# create config file to avoid use arguments
+----------
+	Create config file to avoid use arguments
+	```
 	cp luks-remote.conf.sample luks-remote.conf
+	```
 
-	# edit and fill the file
+	Edit and fill the file
+	```
 	vi luks-remote.conf
+	```
 
 3. Create the container
+----------
+	```
 	./luks-remote.sh create 100
+	```
 
 4. mount the container
+----------
+	```
 	./luks-remote.sh mount
+	```
 
 5. rsync to the container
+----------
+	```
 	./luks-remote.sh rsync
+	```
 
 6. umount the container
+----------
+	```
 	./luks-remote.sh umount
+	```
 
 7. troubleshooting
+----------
 
 	the main problem is network outage while luks is remotely open.
 	because the file system is journalized and mounted with barrier, problems are not as bad as it first looks like for your data.
 
 	case 1 : network is recovered
 
-	# check status
+	check status
+	```
 	./luks-remote.sh status
+	```
 
-	# try umount
+	try umount
+	```
 	./luks-remote.sh umount
+	```
 
-	# check file system consistency
+	check file system consistency
+	```
 	./luks-remote.sh fsck
+	```
 
 
 
