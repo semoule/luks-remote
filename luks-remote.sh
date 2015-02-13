@@ -112,7 +112,7 @@ luks_resize()
 	sudo cryptsetup luksOpen $dev $(basename $luks_file)                            &&
 	sudo cryptsetup resize $(basename $luks_file)	                                &&
 	sleep 2                                                                         &&
-	sudo fsck.ext4 -nv /dev/mapper/$(basename $luks_file)                           &&
+	sudo fsck.ext4  -v /dev/mapper/$(basename $luks_file)                           &&
 	sleep 2                                                                         &&
 	sudo resize2fs /dev/mapper/$(basename $luks_file)                               &&
 	sleep 2                                                                         &&
