@@ -264,6 +264,12 @@ rsync_list=${custom_rsync:-all}
 echo "remote luksfile : ssh://$ruser@$rserver:$rpath/$luks_container"
 echo "local ssh path  : $lpath"
 echo "local luks path : $luks_mountpoint"
+echo
+echo "Rsync slots :"
+for (( i=0; i<${#RSYNC_SOURCE[@]}; i++ ));
+do
+	printf '%-4s %-50s %-3s %-40s\n' "[$i]" "${RSYNC_SOURCE[$i]}" "-->" "${RSYNC_TARGET[$i]}"
+done
 
 # parse command
 case $1 in
