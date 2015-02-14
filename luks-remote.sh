@@ -268,7 +268,7 @@ echo
 echo "Rsync slots :"
 for (( i=0; i<${#RSYNC_SOURCE[@]}; i++ ));
 do
-	printf '%-4s %-50s %-3s %-40s\n' "[$i]" "${RSYNC_SOURCE[$i]}" "-->" "${RSYNC_TARGET[$i]}"
+	printf '%-4s %-50s %-3s %-50s\n' "[$i]" "${RSYNC_SOURCE[$i]}" "-->" "${luks_mountpoint}/${RSYNC_TARGET[$i]}"
 done
 
 # parse command
