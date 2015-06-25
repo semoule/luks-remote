@@ -146,6 +146,8 @@ luks_create()
 }
 luks_status()
 {
+	local i
+
 	echo
 	echo "... check sshfs mount status ..."
 	cat /proc/mounts | grep $ruser@$rserver:$rpath && echo "OK" || echo "KO"
@@ -158,19 +160,44 @@ luks_status()
 	echo "... check luks container mount status ..."
 	cat /proc/mounts | grep $luks_mountpoint && echo "OK" || echo "KO"
 
+	if [ $RSYNC_TARGET_STATUS ]; then
+		echo
+		echo "... rsync status report ..."
+		find "$LUKS_MOUNTPOINT/$RSYNC_TARGET_STATUS" -type f -print0 | xargs -0 tail -n 1 -q
+	fi
+
 	return $?
 }
 luks_rsync()
 {
 	local function_status=0
+	local wstatus
+
+	# TODO : factorize!
+
+	# create report directory on remote if specified.
+	if [ $RSYNC_TARGET_STATUS ]; then mkdir -p "$LUKS_MOUNTPOINT/$RSYNC_TARGET_STATUS"; fi
 
 	if [ "$rsync_list" = "all" ]; then
 		for (( i=0; i<${#RSYNC_SOURCE[@]}; i++ ));
 		do
+			if [ "$LUKS_MOUNTPOINT/$RSYNC_TARGET_STATUS" ]; then
+				echo
+				echo "rsync status history"
+				tail -n 10 -q "$LUKS_MOUNTPOINT/$RSYNC_TARGET_STATUS/${i}.status"
+			fi
 			echo
 			echo "${RSYNC_BIN} ${RSYNC_ARGS} ${RSYNC_SOURCE[$i]} ${luks_mountpoint}/${RSYNC_TARGET[$i]}"
 			      ${RSYNC_BIN} ${RSYNC_ARGS} ${RSYNC_SOURCE[$i]} ${luks_mountpoint}/${RSYNC_TARGET[$i]}
-			let function_status=$function_status+$?
+			wstatus=$?
+			let function_status=$function_status+$wstatus
+			if [ $RSYNC_TARGET_STATUS ] && [ -d "$LUKS_MOUNTPOINT/$RSYNC_TARGET_STATUS" ]; then
+				if [ $wstatus -eq 0 ]; then
+					echo "OK | $(date +"%Y/%m/%d %H:%M") | ${RSYNC_SOURCE[$i]}" >>$LUKS_MOUNTPOINT/$RSYNC_TARGET_STATUS/${i}.status
+				else
+					echo "KO | $(date +"%Y/%m/%d %H:%M") | ${RSYNC_SOURCE[$i]}" >>$LUKS_MOUNTPOINT/$RSYNC_TARGET_STATUS/${i}.status
+				fi
+			fi
 		done
 	else
 		if [ $rsync_list -ge ${#RSYNC_SOURCE[@]} ]; then
@@ -178,10 +205,23 @@ luks_rsync()
 			echo "warning : rsync slot empty. exiting!"
 			function_status=1
 		else
+			if [ "$LUKS_MOUNTPOINT/$RSYNC_TARGET_STATUS" ]; then
+				echo
+				echo "rsync status history"
+				tail -n 10 -q "$LUKS_MOUNTPOINT/$RSYNC_TARGET_STATUS/${rsync_list}.status"
+			fi
 			echo
 			echo "${RSYNC_BIN} ${RSYNC_ARGS} ${RSYNC_SOURCE[$rsync_list]} ${luks_mountpoint}/${RSYNC_TARGET[$rsync_list]}"
 			      ${RSYNC_BIN} ${RSYNC_ARGS} ${RSYNC_SOURCE[$rsync_list]} ${luks_mountpoint}/${RSYNC_TARGET[$rsync_list]}
-			let function_status=$function_status+$?
+			wstatus=$?
+			let function_status=$function_status+$wstatus
+			if [ $RSYNC_TARGET_STATUS ] && [ -d "$LUKS_MOUNTPOINT/$RSYNC_TARGET_STATUS" ]; then
+				if [ $wstatus -eq 0 ]; then
+					echo "OK | $(date +"%Y/%m/%d %H:%M") | ${RSYNC_SOURCE[$rsync_list]}" >>$LUKS_MOUNTPOINT/$RSYNC_TARGET_STATUS/${rsync_list}.status
+				else
+					echo "KO | $(date +"%Y/%m/%d %H:%M") | ${RSYNC_SOURCE[$rsync_list]}" >>$LUKS_MOUNTPOINT/$RSYNC_TARGET_STATUS/${rsync_list}.status
+				fi
+			fi
 		fi
 	fi
 	return $function_status

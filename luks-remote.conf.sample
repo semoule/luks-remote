@@ -36,3 +36,8 @@ RSYNC_SOURCE[2]="$HOME/Images/"
 RSYNC_TARGET[0]="Documents/"
 RSYNC_TARGET[3]="Music/"
 RSYNC_TARGET[2]="Images/"
+
+#rsync report status target directory : relative path into container
+#this will contain one status file per rsync slot
+#each file will contains one line per rsync attempt with date, path and status.
+RSYNC_TARGET_STATUS="luks_remote"
